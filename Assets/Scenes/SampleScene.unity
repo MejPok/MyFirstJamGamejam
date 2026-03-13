@@ -548,7 +548,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDamping: 0
+  m_LinearDamping: 2
   m_AngularDamping: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
@@ -649,9 +649,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00a7c88046ef06343b3f2a3b262ab0ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BasicMovement
-  Speed: 100
+  Speed: 12
+  MaxSpeed: 2
   MousePosition: {x: 0, y: 0}
-  MaxDistance: 3
+  MaxDistance: 4
 --- !u!114 &1047191185
 MonoBehaviour:
   m_ObjectHideFlags: 0
