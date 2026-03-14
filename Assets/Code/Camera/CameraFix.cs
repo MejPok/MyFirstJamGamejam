@@ -1,16 +1,15 @@
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class CameraFix : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public CinemachineCamera vcam;
+    public CinemachineConfiner2D confiner;
+
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
+        vcam.PreviousStateIsValid = false;
+        confiner.InvalidateBoundingShapeCache();
         
     }
 }
