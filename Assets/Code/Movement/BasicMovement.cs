@@ -29,7 +29,7 @@ public class BasicMovement : MonoBehaviour
     Vector2 moveDirection;
     public float MaxDistance = 5f; // Maximum allowed distance from last saved position
 
-    public float DistanceWhileNotTouchingWall { get; private set; }
+    public float DistanceWhileNotTouchingWall { get; set; }
     private Vector2 lastPosition;
     ReturnVine returnVine;
 
@@ -81,8 +81,17 @@ public class BasicMovement : MonoBehaviour
     /// </summary>
     void CheckMaxDistance()
     {
-        
-        Vector2 currentPosition = rb.position;
+
+        Vector2 currentPosition = Vector2.zero;
+        if (returnVine.returningVine)
+        {
+            currentPosition = rb.position;
+            lastPosition = currentPosition;
+            return;
+        }
+
+        currentPosition = rb.position;
+
         float delta = Vector2.Distance(currentPosition, lastPosition);
         if (!wallcheck.touchingWall)
         {
@@ -95,6 +104,7 @@ public class BasicMovement : MonoBehaviour
 
         if (DistanceWhileNotTouchingWall > MaxDistance)
         {
+            Debug.Log("I cant move, i am too far from a wall, ");
             rb.linearVelocity = Vector2.zero;
             allowedToMoveInsideBoundary = false;
         } else {

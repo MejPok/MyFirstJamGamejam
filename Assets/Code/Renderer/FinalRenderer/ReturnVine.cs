@@ -32,6 +32,11 @@ public class ReturnVine : MonoBehaviour
 
                     transform.position = worldPos;
                     VineRibbon.instance.points.RemoveAt(index);
+
+                    GetComponent<BasicMovement>().DistanceWhileNotTouchingWall = VineRibbon.instance.pointsDistance[index];
+                    Debug.Log("Set new distance to " + VineRibbon.instance.pointsDistance[index]);
+                    VineRibbon.instance.pointsDistance.RemoveAt(index);
+
                 }
                 
                 timer = 0;

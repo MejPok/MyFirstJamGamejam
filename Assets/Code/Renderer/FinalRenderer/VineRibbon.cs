@@ -13,9 +13,12 @@ public class VineRibbon : MonoBehaviour
     public bool pixelSnap = true;      // Snap to pixels
 
     public List<Vector3> points = new List<Vector3>();
+    public List<float> pointsDistance = new List<float>();
+
     private Mesh mesh;
 
     public static VineRibbon instance;
+    public BasicMovement movement;
 
     void Start()
     {
@@ -27,7 +30,11 @@ public class VineRibbon : MonoBehaviour
         Vector3 start = GetHeadPosition();
         Vector3 offset = start + Vector3.right * 0.01f; // tiny offset to make 2 points
         points.Add(start);
-        points.Add(offset);
+        points.Add(offset); 
+        pointsDistance.Add(0);
+        pointsDistance.Add(0);
+
+        
 
         UpdateMesh();
     }
@@ -44,6 +51,8 @@ public class VineRibbon : MonoBehaviour
         if (dist >= pointSpacing)
         {
             points.Add(headPos);
+            pointsDistance.Add(movement.DistanceWhileNotTouchingWall);
+            Debug.Log("I moved while i was, away " + movement.DistanceWhileNotTouchingWall);
             UpdateMesh();
         }
     }
