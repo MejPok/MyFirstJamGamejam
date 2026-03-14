@@ -52,6 +52,7 @@ public class BasicMovement : MonoBehaviour
         if (Mouse.current.leftButton.isPressed && allowedToMoveInsideBoundary && !returnVine.returningVine)
         {
             rb.AddForce(moveDirection * Speed);
+            PlaySound();
         }
 
         // Clamp velocity to MaxSpeed to prevent exceeding the speed limit
@@ -73,6 +74,7 @@ public class BasicMovement : MonoBehaviour
         if (rb.linearVelocity.magnitude < 0.1f)
         {
             rb.linearVelocity = Vector2.zero;
+            StopSound();
         }
     }
 
@@ -112,4 +114,26 @@ public class BasicMovement : MonoBehaviour
         }
     }
     bool allowedToMoveInsideBoundary;
+
+    GameObject sound;
+    public void PlaySound()
+    {
+        if(sound == null)
+        {
+            sound = Instantiate(SoundManager.instance.audioPrefab, transform.position, Quaternion.identity);
+            sound.GetComponent<AudioSource>().clip = GetComponent<SoundHolder>().holder[0];
+            sound.GetComponent<AudioSource>().volume = 1;
+            sound.GetComponent<AudioSource>().loop = true;
+        }
+        
+        sound.GetComponent<AudioSource>().Play();
+    }
+    public void StopSound()
+    {
+        if(sound != null)
+        {
+            sound.GetComponent<AudioSource>().Stop();
+            
+        }
+    }
 }
