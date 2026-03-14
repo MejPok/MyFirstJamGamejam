@@ -15,6 +15,11 @@ public class VineRibbon : MonoBehaviour
     public List<Vector3> points = new List<Vector3>();
     public List<float> pointsDistance = new List<float>();
 
+
+    [Header("Sway")]
+    public float swayAmplitude = 0.05f;
+    public float swaySpeed = 3f;
+    public float swayFrequency = 4f;
     private Mesh mesh;
 
     public static VineRibbon instance;
@@ -52,9 +57,11 @@ public class VineRibbon : MonoBehaviour
         {
             points.Add(headPos);
             pointsDistance.Add(movement.DistanceWhileNotTouchingWall);
-            Debug.Log("I moved while i was, away " + movement.DistanceWhileNotTouchingWall);
             UpdateMesh();
         }
+        UpdateMesh();
+
+        
     }
 
     // Get head position in local space, optionally offset by mapRoot
@@ -114,6 +121,12 @@ public class VineRibbon : MonoBehaviour
             Vector3 normal = new Vector3(-forward.y, forward.x, 0f);
 
             Vector3 meshPos = points[i];
+
+            if (pointsDistance[i] > 0) // only sway when detached
+            {
+                float wave = Mathf.Sin(Time.time * swaySpeed + cumulativeLength[i] * swayFrequency);
+                meshPos += normal * wave * swayAmplitude;
+            }
             meshPos.z = 0f; // ensure visible in 2D
             verts[i * 2] = meshPos + normal * width * 0.5f;
             verts[i * 2 + 1] = meshPos - normal * width * 0.5f;
