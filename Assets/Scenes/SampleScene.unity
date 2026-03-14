@@ -1667,7 +1667,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ReturnVine
   returningVine: 0
   timeBetweenMove: 0.01
---- !u!1 &1068920078
+--- !u!114 &1047191187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1047191179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc10ec01ec7fe674ba2121f5ad6a55e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoundHolder
+  holder:
+  - {fileID: 8300000, guid: 6997e002ecb3bcf4ab18a596f559a561, type: 3}
+--- !u!1 &1056246922
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
