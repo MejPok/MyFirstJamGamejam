@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(ReturnVine))]
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(PositionTracker))]
 public class BasicMovement : MonoBehaviour
 {
     public float Speed = 1;
@@ -12,7 +15,7 @@ public class BasicMovement : MonoBehaviour
     public Vector2 MousePosition;
 
     Wallchecker wallcheck;
-    PositionTracker posTracker;
+    public PositionTracker posTracker;
 
 
     /// <summary>
@@ -28,9 +31,11 @@ public class BasicMovement : MonoBehaviour
 
     public float DistanceWhileNotTouchingWall { get; private set; }
     private Vector2 lastPosition;
+    ReturnVine returnVine;
 
     void Start()
     {
+        returnVine = GetComponent<ReturnVine>();
         rb = GetComponent<Rigidbody2D>();
         posTracker = GetComponent<PositionTracker>();
         wallcheck = transform.GetChild(0).GetComponent<Wallchecker>();
@@ -38,13 +43,13 @@ public class BasicMovement : MonoBehaviour
         lastPosition = rb.position;
     }
 
-
+    
 
     void FixedUpdate()
     {
         moveDirection = MousePosition - (Vector2)transform.position;
 
-        if (Mouse.current.leftButton.isPressed && allowedToMoveInsideBoundary)
+        if (Mouse.current.leftButton.isPressed && allowedToMoveInsideBoundary && !returnVine.returningVine)
         {
             rb.AddForce(moveDirection * Speed);
         }

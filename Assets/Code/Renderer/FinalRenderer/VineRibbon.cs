@@ -12,11 +12,14 @@ public class VineRibbon : MonoBehaviour
     public float textureRepeatLength = 1f; // How much length one texture repeat covers
     public bool pixelSnap = true;      // Snap to pixels
 
-    private List<Vector3> points = new List<Vector3>();
+    public List<Vector3> points = new List<Vector3>();
     private Mesh mesh;
+
+    public static VineRibbon instance;
 
     void Start()
     {
+        instance = this;
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
 
@@ -31,6 +34,11 @@ public class VineRibbon : MonoBehaviour
 
     void Update()
     {
+        if (ReturnVine.instance.returningVine)
+        {
+            UpdateMesh();
+            return;
+        }
         Vector3 headPos = GetHeadPosition();
         float dist = Vector3.Distance(points[points.Count - 1], headPos);
         if (dist >= pointSpacing)
@@ -40,20 +48,26 @@ public class VineRibbon : MonoBehaviour
         }
     }
 
-    // Get head position, optionally offset by mapRoot
+    // Get head position in local space, optionally offset by mapRoot
     private Vector3 GetHeadPosition()
     {
-        Vector3 pos = head.position;
+        // Start with the head's world position
+        Vector3 worldPos = head.position;
+
+        // Optional: remove map root offset (e.g., if using a moving map origin)
         if (mapRoot != null)
-            pos = mapRoot.transform.InverseTransformPoint(pos);
+            worldPos = mapRoot.transform.InverseTransformPoint(worldPos);
+
+        // Convert to this GameObject's local space so the mesh is positioned correctly
+        Vector3 localPos = transform.InverseTransformPoint(worldPos);
 
         if (pixelSnap)
         {
             float ppu = 64f; // adjust to your pixels per unit
-            pos.x = Mathf.Round(pos.x * ppu) / ppu;
-            pos.y = Mathf.Round(pos.y * ppu) / ppu;
+            localPos.x = Mathf.Round(localPos.x * ppu) / ppu;
+            localPos.y = Mathf.Round(localPos.y * ppu) / ppu;
         }
-        return pos;
+        return localPos;
     }
 
     private void UpdateMesh()
