@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(ReturnVine))]
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(PositionTracker))]
 public class BasicMovement : MonoBehaviour
 {
     public float Speed = 1;
@@ -12,7 +15,7 @@ public class BasicMovement : MonoBehaviour
     public Vector2 MousePosition;
 
     Wallchecker wallcheck;
-    PositionTracker posTracker;
+    public PositionTracker posTracker;
 
 
     /// <summary>
@@ -26,11 +29,13 @@ public class BasicMovement : MonoBehaviour
     Vector2 moveDirection;
     public float MaxDistance = 5f; // Maximum allowed distance from last saved position
 
-    public float DistanceWhileNotTouchingWall { get; private set; }
+    public float DistanceWhileNotTouchingWall { get; set; }
     private Vector2 lastPosition;
+    ReturnVine returnVine;
 
     void Start()
     {
+        returnVine = GetComponent<ReturnVine>();
         rb = GetComponent<Rigidbody2D>();
         posTracker = GetComponent<PositionTracker>();
         wallcheck = transform.GetChild(0).GetComponent<Wallchecker>();
@@ -38,13 +43,13 @@ public class BasicMovement : MonoBehaviour
         lastPosition = rb.position;
     }
 
-
+    
 
     void FixedUpdate()
     {
         moveDirection = MousePosition - (Vector2)transform.position;
 
-        if (Mouse.current.leftButton.isPressed && allowedToMoveInsideBoundary)
+        if (Mouse.current.leftButton.isPressed && allowedToMoveInsideBoundary && !returnVine.returningVine)
         {
             rb.AddForce(moveDirection * Speed);
         }
@@ -76,8 +81,17 @@ public class BasicMovement : MonoBehaviour
     /// </summary>
     void CheckMaxDistance()
     {
-        
-        Vector2 currentPosition = rb.position;
+
+        Vector2 currentPosition = Vector2.zero;
+        if (returnVine.returningVine)
+        {
+            currentPosition = rb.position;
+            lastPosition = currentPosition;
+            return;
+        }
+
+        currentPosition = rb.position;
+
         float delta = Vector2.Distance(currentPosition, lastPosition);
         if (!wallcheck.touchingWall)
         {
@@ -90,6 +104,7 @@ public class BasicMovement : MonoBehaviour
 
         if (DistanceWhileNotTouchingWall > MaxDistance)
         {
+            Debug.Log("I cant move, i am too far from a wall, ");
             rb.linearVelocity = Vector2.zero;
             allowedToMoveInsideBoundary = false;
         } else {

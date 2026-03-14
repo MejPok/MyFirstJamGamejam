@@ -12,11 +12,17 @@ public class VineRibbon : MonoBehaviour
     public float textureRepeatLength = 1f; // How much length one texture repeat covers
     public bool pixelSnap = true;      // Snap to pixels
 
-    private List<Vector3> points = new List<Vector3>();
+    public List<Vector3> points = new List<Vector3>();
+    public List<float> pointsDistance = new List<float>();
+
     private Mesh mesh;
+
+    public static VineRibbon instance;
+    public BasicMovement movement;
 
     void Start()
     {
+        instance = this;
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
 
@@ -24,36 +30,53 @@ public class VineRibbon : MonoBehaviour
         Vector3 start = GetHeadPosition();
         Vector3 offset = start + Vector3.right * 0.01f; // tiny offset to make 2 points
         points.Add(start);
-        points.Add(offset);
+        points.Add(offset); 
+        pointsDistance.Add(0);
+        pointsDistance.Add(0);
+
+        
 
         UpdateMesh();
     }
 
     void Update()
     {
+        if (ReturnVine.instance.returningVine)
+        {
+            UpdateMesh();
+            return;
+        }
         Vector3 headPos = GetHeadPosition();
         float dist = Vector3.Distance(points[points.Count - 1], headPos);
         if (dist >= pointSpacing)
         {
             points.Add(headPos);
+            pointsDistance.Add(movement.DistanceWhileNotTouchingWall);
+            Debug.Log("I moved while i was, away " + movement.DistanceWhileNotTouchingWall);
             UpdateMesh();
         }
     }
 
-    // Get head position, optionally offset by mapRoot
+    // Get head position in local space, optionally offset by mapRoot
     private Vector3 GetHeadPosition()
     {
-        Vector3 pos = head.position;
+        // Start with the head's world position
+        Vector3 worldPos = head.position;
+
+        // Optional: remove map root offset (e.g., if using a moving map origin)
         if (mapRoot != null)
-            pos = mapRoot.transform.InverseTransformPoint(pos);
+            worldPos = mapRoot.transform.InverseTransformPoint(worldPos);
+
+        // Convert to this GameObject's local space so the mesh is positioned correctly
+        Vector3 localPos = transform.InverseTransformPoint(worldPos);
 
         if (pixelSnap)
         {
             float ppu = 64f; // adjust to your pixels per unit
-            pos.x = Mathf.Round(pos.x * ppu) / ppu;
-            pos.y = Mathf.Round(pos.y * ppu) / ppu;
+            localPos.x = Mathf.Round(localPos.x * ppu) / ppu;
+            localPos.y = Mathf.Round(localPos.y * ppu) / ppu;
         }
-        return pos;
+        return localPos;
     }
 
     private void UpdateMesh()
