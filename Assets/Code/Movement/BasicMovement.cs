@@ -50,6 +50,11 @@ public class BasicMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (Menu.instance.isEnabled)
+        {
+            return;
+        }
+
         moveDirection = MousePosition - (Vector2)transform.position;
 
         if (Mouse.current.leftButton.isPressed && allowedToMoveInsideBoundary && !returnVine.returningVine)
