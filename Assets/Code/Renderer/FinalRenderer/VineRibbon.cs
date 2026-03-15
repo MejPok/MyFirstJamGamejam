@@ -65,6 +65,7 @@ public class VineRibbon : MonoBehaviour
     }
 
     // Get head position in local space, optionally offset by mapRoot
+    public float ppu;
     private Vector3 GetHeadPosition()
     {
         // Start with the head's world position
@@ -78,8 +79,7 @@ public class VineRibbon : MonoBehaviour
         Vector3 localPos = transform.InverseTransformPoint(worldPos);
 
         if (pixelSnap)
-        {
-            float ppu = 64f; // adjust to your pixels per unit
+        {// adjust to your pixels per unit
             localPos.x = Mathf.Round(localPos.x * ppu) / ppu;
             localPos.y = Mathf.Round(localPos.y * ppu) / ppu;
         }
