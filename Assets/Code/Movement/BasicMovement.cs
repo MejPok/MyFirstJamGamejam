@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -43,6 +44,8 @@ public class BasicMovement : MonoBehaviour
         lastPosition = rb.position;
     }
 
+    float timerForBlock;
+    public float timeForBlockSoundCD;
     
 
     void FixedUpdate()
@@ -52,8 +55,23 @@ public class BasicMovement : MonoBehaviour
         if (Mouse.current.leftButton.isPressed && allowedToMoveInsideBoundary && !returnVine.returningVine)
         {
             rb.AddForce(moveDirection * Speed);
-            PlaySound();
+            PlaySoundMove();
+        } else if (returnVine.returningVine)
+        {
+            playBackSound();
         }
+
+        timerForBlock += Time.deltaTime;
+        if(Mouse.current.leftButton.isPressed && !allowedToMoveInsideBoundary && !returnVine.returningVine && timerForBlock > timeForBlockSoundCD)
+        {
+            timerForBlock = 0;
+            GetComponent<SoundHolder>().PlayFX(2, 1);
+        }
+        
+
+        
+
+        
 
         // Clamp velocity to MaxSpeed to prevent exceeding the speed limit
         if (rb.linearVelocity.magnitude > MaxSpeed)
@@ -74,7 +92,7 @@ public class BasicMovement : MonoBehaviour
         if (rb.linearVelocity.magnitude < 0.1f)
         {
             rb.linearVelocity = Vector2.zero;
-            StopSound();
+            StopSoundMove();
         }
     }
 
@@ -115,25 +133,63 @@ public class BasicMovement : MonoBehaviour
     }
     bool allowedToMoveInsideBoundary;
 
-    GameObject sound;
-    public void PlaySound()
+    GameObject soundBack;
+    GameObject soundMove;
+
+    bool playing;
+    bool playingBack;
+
+    public void PlaySoundMove()
     {
-        if(sound == null)
+        if(soundMove == null)
         {
-            sound = Instantiate(SoundManager.instance.audioPrefab, transform.position, Quaternion.identity);
-            sound.GetComponent<AudioSource>().clip = GetComponent<SoundHolder>().holder[0];
-            sound.GetComponent<AudioSource>().volume = 1;
-            sound.GetComponent<AudioSource>().loop = true;
+            soundMove = Instantiate(SoundManager.instance.audioPrefab, transform.position, Quaternion.identity);
+            soundMove.GetComponent<AudioSource>().clip = GetComponent<SoundHolder>().holder[0];
+            soundMove.GetComponent<AudioSource>().volume = 1;
+            soundMove.GetComponent<AudioSource>().loop = true;
         }
-        
-        sound.GetComponent<AudioSource>().Play();
-    }
-    public void StopSound()
-    {
-        if(sound != null)
+        if (!playing)
         {
-            sound.GetComponent<AudioSource>().Stop();
+            soundMove.GetComponent<AudioSource>().Play();
+            playing = true;
+            stopBackSound();
             
+        }
+    }
+    public void StopSoundMove()
+    {
+        if(soundMove != null && playing)
+        {
+            soundMove.GetComponent<AudioSource>().Pause();
+            playing = false;
+            
+        }
+    }
+
+    void playBackSound(){
+        StopSoundMove();
+
+        if(soundBack == null)
+        {
+            soundBack = Instantiate(SoundManager.instance.audioPrefab, transform.position, Quaternion.identity);
+            soundBack.GetComponent<AudioSource>().clip = GetComponent<SoundHolder>().holder[1];
+            soundBack.GetComponent<AudioSource>().volume = 1;
+            soundBack.GetComponent<AudioSource>().loop = true;
+        }
+        if (!playingBack)
+        {
+            soundBack.GetComponent<AudioSource>().Play();
+            playingBack = true;
+            
+        }
+    }
+
+    void stopBackSound()
+    {
+        if(soundBack != null && playingBack)
+        {
+            soundBack.GetComponent<AudioSource>().Pause();
+            playingBack = false;
         }
     }
 }

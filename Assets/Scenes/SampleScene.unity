@@ -396,7 +396,7 @@ Transform:
   m_GameObject: {fileID: 53408497}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.21, y: -1.99, z: -15}
+  m_LocalPosition: {x: 12.27896, y: 0.6623399, z: -15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1040,7 +1040,56 @@ Transform:
   m_GameObject: {fileID: 678487147}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -11.31, y: -6.09, z: 0}
+  m_LocalPosition: {x: 0.35, y: -2.83, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &791930133
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 791930135}
+  - component: {fileID: 791930134}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &791930134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 791930133}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d08f4e13ee10e42408a8c2fe95f90674, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoundManager
+  mainMusic: []
+  audioPrefab: {fileID: 8838922484141907712, guid: 138089306092a9344a2fafab5f7fac6d, type: 3}
+  master: {fileID: 24300002, guid: 78fd0557d10ee6b49bef2d8d071c215b, type: 2}
+  music: {fileID: 3084892927368569202, guid: 78fd0557d10ee6b49bef2d8d071c215b, type: 2}
+  FX: {fileID: 6338435989913097431, guid: 78fd0557d10ee6b49bef2d8d071c215b, type: 2}
+--- !u!4 &791930135
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 791930133}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 7.5234, y: -8.74367, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1475,6 +1524,7 @@ GameObject:
   - component: {fileID: 1047191184}
   - component: {fileID: 1047191185}
   - component: {fileID: 1047191186}
+  - component: {fileID: 1047191187}
   m_Layer: 0
   m_Name: Head
   m_TagString: Untagged
@@ -1705,7 +1755,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1068920078}
+  m_GameObject: {fileID: 1056246922}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -1720,7 +1770,7 @@ CircleCollider2D:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1068920078}
+  m_GameObject: {fileID: 1056246922}
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
@@ -1756,7 +1806,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1068920078}
+  m_GameObject: {fileID: 1056246922}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c21766611481a1b4ca59b11f796e36f4, type: 3}
@@ -2303,7 +2353,7 @@ MonoBehaviour:
   head: {fileID: 1047191183}
   mapRoot: {fileID: 1946545156}
   pointSpacing: 0.01
-  width: 1.3
+  width: 1
   textureRepeatLength: 8
   pixelSnap: 1
   points: []
@@ -2337,7 +2387,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 4196bb997cd15264491054731679edd2, type: 2}
+  - {fileID: 2100000, guid: 0a44febb233021e46a1828c744d8f5bd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2882,3 +2932,4 @@ SceneRoots:
   - {fileID: 1946545157}
   - {fileID: 2008860997}
   - {fileID: 41938391}
+  - {fileID: 791930135}
