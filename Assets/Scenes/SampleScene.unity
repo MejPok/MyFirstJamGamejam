@@ -1687,6 +1687,7 @@ MonoBehaviour:
   MousePosition: {x: 0, y: 0}
   posTracker: {fileID: 0}
   MaxDistance: 4
+  timeForBlockSoundCD: 1
 --- !u!114 &1047191185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1730,7 +1731,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoundHolder
   holder:
-  - {fileID: 8300000, guid: 6997e002ecb3bcf4ab18a596f559a561, type: 3}
+  - {fileID: 8300000, guid: eb2d6b9653e16b340867ee757c624cff, type: 3}
+  - {fileID: 8300000, guid: 524510e6609a2164abd294396e946ba8, type: 3}
+  - {fileID: 8300000, guid: 112e9c27aefb1f44ab721f0ea0152afe, type: 3}
 --- !u!1 &1056246922
 GameObject:
   m_ObjectHideFlags: 0
