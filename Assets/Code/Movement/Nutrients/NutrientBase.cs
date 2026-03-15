@@ -12,9 +12,15 @@ public class NutrientBase : MonoBehaviour
         vine = GetComponent<VineRibbon>();
     }
 
+    bool notifiedUi = false;
     void Update()
     {
         nutrientAmount = MaxNutrientAmount - vine.TotalDistance;
+        if (!notifiedUi)
+        {
+            NutrientControl.instance.NewNutrientBase(this);
+            notifiedUi = true;
+        }
     }
 
 }
