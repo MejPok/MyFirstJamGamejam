@@ -15,12 +15,17 @@ public class VineRibbon : MonoBehaviour
     public List<Vector3> points = new List<Vector3>();
     public List<float> pointsDistance = new List<float>();
 
-
     [Header("Sway")]
     public float swayAmplitude = 0.05f;
     public float swaySpeed = 3f;
     public float swayFrequency = 4f;
+
     private Mesh mesh;
+    private Vector3[] verts;
+    private Vector2[] uvs;
+    private int[] tris;
+    private float[] cumulativeLength;
+    private bool meshNeedsRebuild = false;
 
     public static VineRibbon instance;
     public BasicMovement movement;
@@ -29,6 +34,7 @@ public class VineRibbon : MonoBehaviour
     {
         instance = this;
         mesh = new Mesh();
+        mesh.MarkDynamic(); // Optimize for frequent updates
         GetComponent<MeshFilter>().mesh = mesh;
 
         // Initialize first two points for proper mesh
@@ -39,29 +45,34 @@ public class VineRibbon : MonoBehaviour
         pointsDistance.Add(0);
         pointsDistance.Add(0);
 
-        
-
-        UpdateMesh();
+        RebuildMesh();
     }
 
     void Update()
     {
         if (ReturnVine.instance.returningVine)
         {
-            UpdateMesh();
-            return;
+            meshNeedsRebuild = true;
         }
-        Vector3 headPos = GetHeadPosition();
-        float dist = Vector3.Distance(points[points.Count - 1], headPos);
-        if (dist >= pointSpacing)
+        else
         {
-            points.Add(headPos);
-            pointsDistance.Add(movement.DistanceWhileNotTouchingWall);
-            UpdateMesh();
+            Vector3 headPos = GetHeadPosition();
+            float dist = Vector3.Distance(points[points.Count - 1], headPos);
+            if (dist >= pointSpacing)
+            {
+                points.Add(headPos);
+                pointsDistance.Add(movement.DistanceWhileNotTouchingWall);
+                meshNeedsRebuild = true;
+            }
         }
-        UpdateMesh();
 
-        
+        if (meshNeedsRebuild)
+        {
+            RebuildMesh();
+            meshNeedsRebuild = false;
+        }
+
+        UpdateSway();
     }
 
     // Get head position in local space, optionally offset by mapRoot
@@ -86,19 +97,20 @@ public class VineRibbon : MonoBehaviour
         return localPos;
     }
 
-    private void UpdateMesh()
+    public float TotalDistance;
+    private void RebuildMesh()
     {
         if (points.Count < 2)
             return; // cannot build mesh with less than 2 points
 
         int vertCount = points.Count * 2;
-        Vector3[] verts = new Vector3[vertCount];
-        Vector2[] uvs = new Vector2[vertCount];
-        int[] tris = new int[(points.Count - 1) * 6];
+        verts = new Vector3[vertCount];
+        uvs = new Vector2[vertCount];
+        tris = new int[(points.Count - 1) * 6];
+        cumulativeLength = new float[points.Count];
 
         // Compute cumulative distances along the vine
         float totalLength = 0f;
-        float[] cumulativeLength = new float[points.Count];
         cumulativeLength[0] = 0f;
         for (int i = 1; i < points.Count; i++)
         {
@@ -106,8 +118,9 @@ public class VineRibbon : MonoBehaviour
             totalLength += d;
             cumulativeLength[i] = totalLength;
         }
+        TotalDistance = totalLength;
 
-        // Build vertices and UVs
+        // Build vertices and UVs (base positions without sway)
         for (int i = 0; i < points.Count; i++)
         {
             Vector3 forward;
@@ -119,15 +132,9 @@ public class VineRibbon : MonoBehaviour
                 forward = ((points[i + 1] - points[i]).normalized + (points[i] - points[i - 1]).normalized).normalized;
 
             Vector3 normal = new Vector3(-forward.y, forward.x, 0f);
-
             Vector3 meshPos = points[i];
-
-            if (pointsDistance[i] > 0) // only sway when detached
-            {
-                float wave = Mathf.Sin(Time.time * swaySpeed + cumulativeLength[i] * swayFrequency);
-                meshPos += normal * wave * swayAmplitude;
-            }
             meshPos.z = 0f; // ensure visible in 2D
+
             verts[i * 2] = meshPos + normal * width * 0.5f;
             verts[i * 2 + 1] = meshPos - normal * width * 0.5f;
 
@@ -156,5 +163,37 @@ public class VineRibbon : MonoBehaviour
         mesh.vertices = verts;
         mesh.triangles = tris;
         mesh.uv = uvs;
+    }
+
+    private void UpdateSway()
+    {
+        if (verts == null || points.Count < 2)
+            return;
+
+        // Update vertices for sway (only modify positions where pointsDistance > 0)
+        for (int i = 0; i < points.Count; i++)
+        {
+            if (pointsDistance[i] > 0) // only sway when detached
+            {
+                Vector3 forward;
+                if (i == 0)
+                    forward = (points[i + 1] - points[i]).normalized;
+                else if (i == points.Count - 1)
+                    forward = (points[i] - points[i - 1]).normalized;
+                else
+                    forward = ((points[i + 1] - points[i]).normalized + (points[i] - points[i - 1]).normalized).normalized;
+
+                Vector3 normal = new Vector3(-forward.y, forward.x, 0f);
+                Vector3 meshPos = points[i];
+                float wave = Mathf.Sin(Time.time * swaySpeed + cumulativeLength[i] * swayFrequency);
+                meshPos += normal * wave * swayAmplitude;
+                meshPos.z = 0f;
+
+                verts[i * 2] = meshPos + normal * width * 0.5f;
+                verts[i * 2 + 1] = meshPos - normal * width * 0.5f;
+            }
+        }
+
+        mesh.vertices = verts; // Update the mesh with new vertex positions
     }
 }

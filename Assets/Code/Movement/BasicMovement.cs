@@ -34,8 +34,10 @@ public class BasicMovement : MonoBehaviour
     private Vector2 lastPosition;
     ReturnVine returnVine;
 
+    public static BasicMovement instance;
     void Start()
     {
+        instance = this;
         returnVine = GetComponent<ReturnVine>();
         rb = GetComponent<Rigidbody2D>();
         posTracker = GetComponent<PositionTracker>();
@@ -59,7 +61,9 @@ public class BasicMovement : MonoBehaviour
 
         if (Mouse.current.leftButton.isPressed && allowedToMoveInsideBoundary && !returnVine.returningVine)
         {
-            rb.AddForce(moveDirection * Speed);
+            float distance = moveDirection.magnitude;
+            float forceMagnitude = distance * Speed;
+            rb.AddForce(transform.right * forceMagnitude);
             PlaySoundMove();
         } else if (returnVine.returningVine)
         {
