@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class NutrientControl : MonoBehaviour
 {
     public static NutrientControl instance;
-    NutrientBase root;
+    public  NutrientBase root;
     void Start()
     {
         instance = this;

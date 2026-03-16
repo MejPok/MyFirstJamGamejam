@@ -14,6 +14,8 @@ public class VineRibbon : MonoBehaviour
 
     public List<Vector3> points = new List<Vector3>();
     public List<float> pointsDistance = new List<float>();
+    public List<Quaternion> pointsRotation = new List<Quaternion>();
+
 
     [Header("Sway")]
     public float swayAmplitude = 0.05f;
@@ -27,29 +29,44 @@ public class VineRibbon : MonoBehaviour
     private float[] cumulativeLength;
     private bool meshNeedsRebuild = false;
 
-    public static VineRibbon instance;
+
     public BasicMovement movement;
 
     void Start()
     {
-        instance = this;
+        WorldControl.instance.SetNewRoot(this);
         mesh = new Mesh();
         mesh.MarkDynamic(); // Optimize for frequent updates
         GetComponent<MeshFilter>().mesh = mesh;
 
-        // Initialize first two points for proper mesh
-        Vector3 start = GetHeadPosition();
-        Vector3 offset = start + Vector3.right * 0.01f; // tiny offset to make 2 points
-        points.Add(start);
-        points.Add(offset); 
+        // If a map root is provided, keep this object positioned at it so the mesh can start from (0,0) in local space.
+        if (mapRoot != null)
+            transform.position = mapRoot.transform.position;
+
+        // Start the mesh from the local origin (map root) and grow toward the head position
+        points.Add(Vector3.zero);
+        points.Add(GetHeadPosition());
+
         pointsDistance.Add(0);
         pointsDistance.Add(0);
+
+        pointsRotation.Add(movement.transform.rotation);
+        pointsRotation.Add(movement.transform.rotation);
+
 
         RebuildMesh();
     }
 
     void Update()
     {
+        // Keep this object pinned to the map root if assigned, so local (0,0) stays at the map root.
+        if (mapRoot != null)
+            transform.position = mapRoot.transform.position;
+
+        // Keep the first point anchored at local zero
+        if (points.Count > 0)
+            points[0] = Vector3.zero;
+
         if (ReturnVine.instance.returningVine)
         {
             meshNeedsRebuild = true;
@@ -62,6 +79,8 @@ public class VineRibbon : MonoBehaviour
             {
                 points.Add(headPos);
                 pointsDistance.Add(movement.DistanceWhileNotTouchingWall);
+                pointsRotation.Add(movement.transform.rotation);
+
                 meshNeedsRebuild = true;
             }
         }
@@ -75,22 +94,16 @@ public class VineRibbon : MonoBehaviour
         UpdateSway();
     }
 
-    // Get head position in local space, optionally offset by mapRoot
+    // Get head position in this object's local space.
+    // If a mapRoot is set, this object is kept at mapRoot's world position so the vine starts at (0,0) in local space.
     public float ppu;
     private Vector3 GetHeadPosition()
     {
-        // Start with the head's world position
-        Vector3 worldPos = head.position;
-
-        // Optional: remove map root offset (e.g., if using a moving map origin)
-        if (mapRoot != null)
-            worldPos = mapRoot.transform.InverseTransformPoint(worldPos);
-
-        // Convert to this GameObject's local space so the mesh is positioned correctly
-        Vector3 localPos = transform.InverseTransformPoint(worldPos);
+        // Convert the head's world position to this GameObject's local space
+        Vector3 localPos = transform.InverseTransformPoint(head.position);
 
         if (pixelSnap)
-        {// adjust to your pixels per unit
+        { // adjust to your pixels per unit
             localPos.x = Mathf.Round(localPos.x * ppu) / ppu;
             localPos.y = Mathf.Round(localPos.y * ppu) / ppu;
         }

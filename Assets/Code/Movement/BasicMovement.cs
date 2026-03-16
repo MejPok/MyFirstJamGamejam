@@ -59,7 +59,7 @@ public class BasicMovement : MonoBehaviour
 
         moveDirection = MousePosition - (Vector2)transform.position;
 
-        if (Mouse.current.leftButton.isPressed && allowedToMoveInsideBoundary && !returnVine.returningVine)
+        if (Mouse.current.leftButton.isPressed && allowedToMoveInsideBoundary && !returnVine.returningVine && NutrientControl.instance.root.nutrientAmount > 0)
         {
             float distance = moveDirection.magnitude;
             float forceMagnitude = distance * Speed;
