@@ -35,6 +35,10 @@ public class VineRibbon : MonoBehaviour
     void Start()
     {
         WorldControl.instance.SetNewRoot(this);
+        var Player = GameObject.FindWithTag("Player");
+        head = Player.transform;
+        movement = Player.GetComponent<BasicMovement>();
+
         mesh = new Mesh();
         mesh.MarkDynamic(); // Optimize for frequent updates
         GetComponent<MeshFilter>().mesh = mesh;
@@ -56,9 +60,11 @@ public class VineRibbon : MonoBehaviour
 
         RebuildMesh();
     }
-
+    bool setMySelf;
     void Update()
     {
+
+
         // Keep this object pinned to the map root if assigned, so local (0,0) stays at the map root.
         if (mapRoot != null)
             transform.position = mapRoot.transform.position;

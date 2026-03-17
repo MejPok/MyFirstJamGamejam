@@ -71,7 +71,7 @@ public class BasicMovement : MonoBehaviour
         }
 
         timerForBlock += Time.deltaTime;
-        if(Mouse.current.leftButton.isPressed && !allowedToMoveInsideBoundary && !returnVine.returningVine && timerForBlock > timeForBlockSoundCD)
+        if(Mouse.current.leftButton.isPressed && !allowedToMoveInsideBoundary && !returnVine.returningVine && timerForBlock > timeForBlockSoundCD && DistanceWhileNotTouchingWall > MaxDistance)
         {
             timerForBlock = 0;
             GetComponent<SoundHolder>().PlayFX(2, 1);
