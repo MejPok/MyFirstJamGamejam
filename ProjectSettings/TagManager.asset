@@ -41,5 +41,11 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Player
+    uniqueID: 2735859579
+    locked: 0
+  - name: Mis
+    uniqueID: 3061664229
+    locked: 0
   m_RenderingLayers:
   - Default

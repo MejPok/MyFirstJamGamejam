@@ -34,8 +34,10 @@ public class BasicMovement : MonoBehaviour
     private Vector2 lastPosition;
     ReturnVine returnVine;
 
+    public static BasicMovement instance;
     void Start()
     {
+        instance = this;
         returnVine = GetComponent<ReturnVine>();
         rb = GetComponent<Rigidbody2D>();
         posTracker = GetComponent<PositionTracker>();
@@ -57,9 +59,11 @@ public class BasicMovement : MonoBehaviour
 
         moveDirection = MousePosition - (Vector2)transform.position;
 
-        if (Mouse.current.leftButton.isPressed && allowedToMoveInsideBoundary && !returnVine.returningVine)
+        if (Mouse.current.leftButton.isPressed && allowedToMoveInsideBoundary && !returnVine.returningVine && NutrientControl.instance.root.nutrientAmount > 0)
         {
-            rb.AddForce(moveDirection * Speed);
+            float distance = moveDirection.magnitude;
+            float forceMagnitude = distance * Speed;
+            rb.AddForce(transform.right * forceMagnitude);
             PlaySoundMove();
         } else if (returnVine.returningVine)
         {
@@ -67,7 +71,7 @@ public class BasicMovement : MonoBehaviour
         }
 
         timerForBlock += Time.deltaTime;
-        if(Mouse.current.leftButton.isPressed && !allowedToMoveInsideBoundary && !returnVine.returningVine && timerForBlock > timeForBlockSoundCD)
+        if(Mouse.current.leftButton.isPressed && !allowedToMoveInsideBoundary && !returnVine.returningVine && timerForBlock > timeForBlockSoundCD && DistanceWhileNotTouchingWall > MaxDistance)
         {
             timerForBlock = 0;
             GetComponent<SoundHolder>().PlayFX(2, 1);

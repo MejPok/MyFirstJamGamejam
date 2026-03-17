@@ -14,91 +14,122 @@ public class VineRibbon : MonoBehaviour
 
     public List<Vector3> points = new List<Vector3>();
     public List<float> pointsDistance = new List<float>();
+    public List<Quaternion> pointsRotation = new List<Quaternion>();
 
 
     [Header("Sway")]
     public float swayAmplitude = 0.05f;
     public float swaySpeed = 3f;
     public float swayFrequency = 4f;
-    private Mesh mesh;
 
-    public static VineRibbon instance;
+    private Mesh mesh;
+    private Vector3[] verts;
+    private Vector2[] uvs;
+    private int[] tris;
+    private float[] cumulativeLength;
+    private bool meshNeedsRebuild = false;
+
+
     public BasicMovement movement;
 
     void Start()
     {
-        instance = this;
+        WorldControl.instance.SetNewRoot(this);
+        var Player = GameObject.FindWithTag("Player");
+        head = Player.transform;
+        movement = Player.GetComponent<BasicMovement>();
+
         mesh = new Mesh();
+        mesh.MarkDynamic(); // Optimize for frequent updates
         GetComponent<MeshFilter>().mesh = mesh;
 
-        // Initialize first two points for proper mesh
-        Vector3 start = GetHeadPosition();
-        Vector3 offset = start + Vector3.right * 0.01f; // tiny offset to make 2 points
-        points.Add(start);
-        points.Add(offset); 
+        // If a map root is provided, keep this object positioned at it so the mesh can start from (0,0) in local space.
+        if (mapRoot != null)
+            transform.position = mapRoot.transform.position;
+
+        // Start the mesh from the local origin (map root) and grow toward the head position
+        points.Add(Vector3.zero);
+        points.Add(GetHeadPosition());
+
         pointsDistance.Add(0);
         pointsDistance.Add(0);
 
-        
+        pointsRotation.Add(movement.transform.rotation);
+        pointsRotation.Add(movement.transform.rotation);
 
-        UpdateMesh();
+
+        RebuildMesh();
     }
-
+    bool setMySelf;
     void Update()
     {
+
+
+        // Keep this object pinned to the map root if assigned, so local (0,0) stays at the map root.
+        if (mapRoot != null)
+            transform.position = mapRoot.transform.position;
+
+        // Keep the first point anchored at local zero
+        if (points.Count > 0)
+            points[0] = Vector3.zero;
+
         if (ReturnVine.instance.returningVine)
         {
-            UpdateMesh();
-            return;
+            meshNeedsRebuild = true;
         }
-        Vector3 headPos = GetHeadPosition();
-        float dist = Vector3.Distance(points[points.Count - 1], headPos);
-        if (dist >= pointSpacing)
+        else
         {
-            points.Add(headPos);
-            pointsDistance.Add(movement.DistanceWhileNotTouchingWall);
-            UpdateMesh();
-        }
-        UpdateMesh();
+            Vector3 headPos = GetHeadPosition();
+            float dist = Vector3.Distance(points[points.Count - 1], headPos);
+            if (dist >= pointSpacing)
+            {
+                points.Add(headPos);
+                pointsDistance.Add(movement.DistanceWhileNotTouchingWall);
+                pointsRotation.Add(movement.transform.rotation);
 
-        
+                meshNeedsRebuild = true;
+            }
+        }
+
+        if (meshNeedsRebuild)
+        {
+            RebuildMesh();
+            meshNeedsRebuild = false;
+        }
+
+        UpdateSway();
     }
 
-    // Get head position in local space, optionally offset by mapRoot
+    // Get head position in this object's local space.
+    // If a mapRoot is set, this object is kept at mapRoot's world position so the vine starts at (0,0) in local space.
     public float ppu;
     private Vector3 GetHeadPosition()
     {
-        // Start with the head's world position
-        Vector3 worldPos = head.position;
-
-        // Optional: remove map root offset (e.g., if using a moving map origin)
-        if (mapRoot != null)
-            worldPos = mapRoot.transform.InverseTransformPoint(worldPos);
-
-        // Convert to this GameObject's local space so the mesh is positioned correctly
-        Vector3 localPos = transform.InverseTransformPoint(worldPos);
+        // Convert the head's world position to this GameObject's local space
+        Vector3 localPos = transform.InverseTransformPoint(head.position);
 
         if (pixelSnap)
-        {// adjust to your pixels per unit
+        { // adjust to your pixels per unit
             localPos.x = Mathf.Round(localPos.x * ppu) / ppu;
             localPos.y = Mathf.Round(localPos.y * ppu) / ppu;
         }
         return localPos;
     }
 
-    private void UpdateMesh()
+    public float TotalDistance;
+    private void RebuildMesh()
     {
         if (points.Count < 2)
             return; // cannot build mesh with less than 2 points
 
         int vertCount = points.Count * 2;
-        Vector3[] verts = new Vector3[vertCount];
-        Vector2[] uvs = new Vector2[vertCount];
-        int[] tris = new int[(points.Count - 1) * 6];
+        verts = new Vector3[vertCount];
+        uvs = new Vector2[vertCount];
+        tris = new int[(points.Count - 1) * 6];
+        cumulativeLength = new float[points.Count];
 
         // Compute cumulative distances along the vine
         float totalLength = 0f;
-        float[] cumulativeLength = new float[points.Count];
         cumulativeLength[0] = 0f;
         for (int i = 1; i < points.Count; i++)
         {
@@ -106,8 +137,9 @@ public class VineRibbon : MonoBehaviour
             totalLength += d;
             cumulativeLength[i] = totalLength;
         }
+        TotalDistance = totalLength;
 
-        // Build vertices and UVs
+        // Build vertices and UVs (base positions without sway)
         for (int i = 0; i < points.Count; i++)
         {
             Vector3 forward;
@@ -119,15 +151,9 @@ public class VineRibbon : MonoBehaviour
                 forward = ((points[i + 1] - points[i]).normalized + (points[i] - points[i - 1]).normalized).normalized;
 
             Vector3 normal = new Vector3(-forward.y, forward.x, 0f);
-
             Vector3 meshPos = points[i];
-
-            if (pointsDistance[i] > 0) // only sway when detached
-            {
-                float wave = Mathf.Sin(Time.time * swaySpeed + cumulativeLength[i] * swayFrequency);
-                meshPos += normal * wave * swayAmplitude;
-            }
             meshPos.z = 0f; // ensure visible in 2D
+
             verts[i * 2] = meshPos + normal * width * 0.5f;
             verts[i * 2 + 1] = meshPos - normal * width * 0.5f;
 
@@ -156,5 +182,37 @@ public class VineRibbon : MonoBehaviour
         mesh.vertices = verts;
         mesh.triangles = tris;
         mesh.uv = uvs;
+    }
+
+    private void UpdateSway()
+    {
+        if (verts == null || points.Count < 2)
+            return;
+
+        // Update vertices for sway (only modify positions where pointsDistance > 0)
+        for (int i = 0; i < points.Count; i++)
+        {
+            if (pointsDistance[i] > 0) // only sway when detached
+            {
+                Vector3 forward;
+                if (i == 0)
+                    forward = (points[i + 1] - points[i]).normalized;
+                else if (i == points.Count - 1)
+                    forward = (points[i] - points[i - 1]).normalized;
+                else
+                    forward = ((points[i + 1] - points[i]).normalized + (points[i] - points[i - 1]).normalized).normalized;
+
+                Vector3 normal = new Vector3(-forward.y, forward.x, 0f);
+                Vector3 meshPos = points[i];
+                float wave = Mathf.Sin(Time.time * swaySpeed + cumulativeLength[i] * swayFrequency);
+                meshPos += normal * wave * swayAmplitude;
+                meshPos.z = 0f;
+
+                verts[i * 2] = meshPos + normal * width * 0.5f;
+                verts[i * 2 + 1] = meshPos - normal * width * 0.5f;
+            }
+        }
+
+        mesh.vertices = verts; // Update the mesh with new vertex positions
     }
 }
