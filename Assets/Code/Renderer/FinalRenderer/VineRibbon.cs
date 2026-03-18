@@ -249,6 +249,7 @@ public class VineRibbon : MonoBehaviour
         points.Clear();
         pointsDistance.Clear();
         pointsRotation.Clear();
+        cumulativeLength = null;
         ResetAllFlowers();
         Start();
     }
