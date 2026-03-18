@@ -157,7 +157,7 @@ GameObject:
   - component: {fileID: 8404388862647290001}
   - component: {fileID: 4865974265467648102}
   m_Layer: 0
-  m_Name: Square
+  m_Name: RootPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

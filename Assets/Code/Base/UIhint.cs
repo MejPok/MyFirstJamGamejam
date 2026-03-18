@@ -10,6 +10,8 @@ public class UIhint : MonoBehaviour
     public bool showHint;
 
     public List<ChangeRoot> bases = new List<ChangeRoot>();
+    public List<Flower> flowers = new List<Flower>();
+
 
     void Awake()
     {
@@ -19,6 +21,10 @@ public class UIhint : MonoBehaviour
     public void AddToBases(ChangeRoot baseRoot)
     {
         bases.Add(baseRoot);
+    }
+    public void AddToFlowers(Flower flower)
+    {
+        flowers.Add(flower);
     }
     public void SetHint(string hint)
     {
@@ -40,9 +46,23 @@ public class UIhint : MonoBehaviour
                 showHint = true;
             }
 
+
         }
 
-        hintText.text = "Press E to replant";
+        for(int i = 0; i < flowers.Count; i++)
+        {
+            if(flowers[i] == null)
+            {
+                flowers.RemoveAt(i);
+                continue;
+            }
+
+            if(flowers[i].isPlayerInside){
+                showHint = true;
+            }
+
+
+        }
         hintText.enabled = showHint;
         Debug.Log(showHint);
         

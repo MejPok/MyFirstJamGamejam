@@ -29,8 +29,13 @@ public class VineRibbon : MonoBehaviour
     private float[] cumulativeLength;
     private bool meshNeedsRebuild = false;
 
+    // Keep track of where the head started so we can correctly restore it on reset.
+    private Vector3 initialHeadPosition;
+    private Quaternion initialHeadRotation;
+    private float initialDistanceWhileNotTouchingWall;
 
     public BasicMovement movement;
+
 
     void Start()
     {
@@ -38,6 +43,11 @@ public class VineRibbon : MonoBehaviour
         var Player = GameObject.FindWithTag("Player");
         head = Player.transform;
         movement = Player.GetComponent<BasicMovement>();
+
+        // Cache the head's starting transform so we can restore it when resetting the world.
+        initialHeadPosition = head.position;
+        initialHeadRotation = head.rotation;
+        initialDistanceWhileNotTouchingWall = movement.DistanceWhileNotTouchingWall;
 
         mesh = new Mesh();
         mesh.MarkDynamic(); // Optimize for frequent updates
@@ -59,6 +69,7 @@ public class VineRibbon : MonoBehaviour
 
 
         RebuildMesh();
+        ResetAllFlowers();
     }
     bool setMySelf;
     void Update()
@@ -214,5 +225,32 @@ public class VineRibbon : MonoBehaviour
         }
 
         mesh.vertices = verts; // Update the mesh with new vertex positions
+    }
+
+    public void ResetAllFlowers()
+    {
+        if(transform.parent.parent != null)
+        {
+            var flowerHolder = transform.parent.parent.GetComponent<FlowerHolder>();
+            flowerHolder.ResetFlowers();
+        }
+        
+    }
+
+    public void ResetWorld()
+    {
+        // Restore the player head to the same position/rotation it started at.
+        movement.ResetWorld(initialHeadPosition);
+
+        head.transform.position = initialHeadPosition;
+        head.transform.rotation = initialHeadRotation;
+        movement.DistanceWhileNotTouchingWall = initialDistanceWhileNotTouchingWall;
+
+        points.Clear();
+        pointsDistance.Clear();
+        pointsRotation.Clear();
+        cumulativeLength = null;
+        ResetAllFlowers();
+        Start();
     }
 }

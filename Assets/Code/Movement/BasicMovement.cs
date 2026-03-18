@@ -105,6 +105,11 @@ public class BasicMovement : MonoBehaviour
         }
     }
 
+    public void ResetWorld(Vector3 firstPos)
+    {
+        lastPosition = firstPos;
+    }
+
     /// <summary>
     /// Tracks distance traveled while not touching a wall, and stops movement if limits are exceeded.
     /// </summary>

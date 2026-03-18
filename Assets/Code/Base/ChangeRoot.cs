@@ -32,6 +32,7 @@ public class ChangeRoot : MonoBehaviour
     {
         if (PlayerInside)
         {
+            UIhint.instance.SetHint("Press E to replant");
             if (Keyboard.current.eKey.wasPressedThisFrame)
             {
                 StartChangingRoot();
