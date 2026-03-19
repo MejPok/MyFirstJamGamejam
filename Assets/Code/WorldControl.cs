@@ -19,7 +19,7 @@ public class WorldControl : MonoBehaviour
     {
         if(ribbon != null && ribbon != rib)
         {
-            Destroy(ribbon.gameObject);
+            ribbon.Freezed = true;
         }
         ribbon = rib;
     }

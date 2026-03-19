@@ -36,6 +36,8 @@ public class VineRibbon : MonoBehaviour
 
     public BasicMovement movement;
 
+    public bool Freezed;
+
 
     void Start()
     {
@@ -74,7 +76,10 @@ public class VineRibbon : MonoBehaviour
     bool setMySelf;
     void Update()
     {
-
+        if (Freezed)
+        {
+            return;
+        }
 
         // Keep this object pinned to the map root if assigned, so local (0,0) stays at the map root.
         if (mapRoot != null)
@@ -253,4 +258,6 @@ public class VineRibbon : MonoBehaviour
         ResetAllFlowers();
         Start();
     }
+
+    
 }
