@@ -108,7 +108,7 @@ MonoBehaviour:
   head: {fileID: 0}
   mapRoot: {fileID: 4339610570393954965}
   pointSpacing: 0.01
-  width: 1
+  width: 0.7
   textureRepeatLength: 8
   pixelSnap: 1
   points: []
@@ -146,6 +146,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NutrientBase
   MaxNutrientAmount: 100
   nutrientAmount: 0
+  nutrientAmountFlower: 0
 --- !u!1 &4339610570393954965
 GameObject:
   m_ObjectHideFlags: 0
