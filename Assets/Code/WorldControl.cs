@@ -8,6 +8,7 @@ public class WorldControl : MonoBehaviour
     public VineRibbon ribbon;
 
     public GameObject flowerPrefab;
+    public GameObject BlackScreen;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
@@ -27,7 +28,13 @@ public class WorldControl : MonoBehaviour
     {
         if (Keyboard.current.rKey.wasPressedThisFrame)
         {
-            ribbon.ResetWorld();
+            
+            BlackScreen.GetComponent<Animator>().SetTrigger("Smoke");
         }
+    }
+
+    public void FullReset()
+    {
+        ribbon.ResetWorld();
     }
 }
