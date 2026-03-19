@@ -1,5 +1,6 @@
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CameraFix : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class CameraFix : MonoBehaviour
     {
         vcam.PreviousStateIsValid = false;
         confiner.InvalidateBoundingShapeCache();
-        
+
     }
+
 }
