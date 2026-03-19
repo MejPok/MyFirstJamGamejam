@@ -14,4 +14,10 @@ public class CameraFix : MonoBehaviour
 
     }
 
+    void Update()
+    {
+        confiner.InvalidateBoundingShapeCache();
+        
+    }
+
 }
