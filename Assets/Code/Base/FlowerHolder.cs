@@ -9,9 +9,13 @@ public class FlowerHolder : MonoBehaviour
 
     public void ResetFlowers()
     {
-        flowers = new GameObject[flowerPositions.Length];
-        DestroyFlowers();
-        CreateFlowers();
+        if(flowerPositions != null)
+        {
+            flowers = new GameObject[flowerPositions.Length];
+            DestroyFlowers();
+            CreateFlowers();    
+        }
+        
 
         
     }
