@@ -11,6 +11,7 @@ public class Altar : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             PlayerInside = true;
+            UIhint.instance.SetHint("Press E to resurrect");
         }
     }
     void OnTriggerExit2D(Collider2D collision)

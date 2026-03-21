@@ -11,6 +11,8 @@ public class UIhint : MonoBehaviour
 
     public List<ChangeRoot> bases = new List<ChangeRoot>();
     public List<Flower> flowers = new List<Flower>();
+    public Altar altar;
+
 
 
     void Awake()
@@ -62,6 +64,11 @@ public class UIhint : MonoBehaviour
             }
 
 
+        }
+
+        if (altar.PlayerInside)
+        {
+            showHint = true;
         }
         hintText.enabled = showHint;
         Debug.Log(showHint);

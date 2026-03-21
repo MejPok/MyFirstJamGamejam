@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 public class ChangeRoot : MonoBehaviour
 {
     public GameObject root;
+    public float nutrientAmount = 100f;
+
 
     void Start()
     {
@@ -44,6 +46,7 @@ public class ChangeRoot : MonoBehaviour
     {
         var newRoot = Instantiate(WorldControl.instance.rootPrefab, transform.position + offset, Quaternion.identity);
         newRoot.transform.SetParent(transform);
+        newRoot.transform.GetChild(0).GetComponent<NutrientBase>().MaxNutrientAmount = nutrientAmount;
 
         Destroy(this);
     }
